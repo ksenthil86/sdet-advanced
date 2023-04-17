@@ -6,10 +6,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Parameters;
@@ -24,6 +28,7 @@ public class BaseClass {
 	public static String url;
 	public static ExtentSparkReporter reporter;
 	public static ExtentReports extent;
+	public static WebDriver driver;
 	
 	
 	@BeforeSuite
@@ -33,6 +38,7 @@ public class BaseClass {
 		reporter = new ExtentSparkReporter(System.getProperty("user.dir")+"/resources/output.html");
 		extent = new ExtentReports();
 		extent.attachReporter(reporter);
+		initialize();
 				
 	}
 	
@@ -50,14 +56,6 @@ public class BaseClass {
 		}
 	}
 	
-	@Parameters({"username","password"})
-	@DataProvider(name="TestData")
-	public HashMap<String,String> readTestData(String username,String password) {
-		HashMap<String,String> map = new HashMap<String,String>();
-		map.put("username", username);
-		map.put("password", password);
-		return map;
-	}
 	
 	public void takeScreenshot(WebDriver driver,String name) {
 		try {
@@ -71,6 +69,23 @@ public class BaseClass {
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void initialize() {
+		
+		String browser = prop.getProperty("browser");
+		
+		if(browser.equals("Edge")) {
+			System.setProperty("webdriver.edge.driver",System.getProperty("user.dir")+"/src/test/java/resources/msedgedriver.exe");
+			driver=new EdgeDriver();
+		}else if(browser.equals("Firefox")) {
+			System.setProperty("webdriver.gecko.driver",System.getProperty("user.dir")+"/src/test/java/resources/geckodriver.exe");
+			driver=new FirefoxDriver();
+		}
+		
+		driver.manage().window().maximize();
+		driver.manage().timeouts().pageLoadTimeout(20, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
 	}
 
 }
