@@ -22,7 +22,7 @@ public class SauceLoginPage {
 	public SauceLoginPage(WebDriver driver) {
 		
 		this.driver=driver;
-		PageFactory.initElements(driver,SauceLoginPage.class);
+		PageFactory.initElements(driver,this);
 		
 	}
 	
